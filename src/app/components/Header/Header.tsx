@@ -1,5 +1,7 @@
 import { shouldDisplayTestingMsg } from "@/config";
 
+import { BbnConnectSmall } from "../Connect/BbnConnectSmall";
+import { BbnConnectedSmall } from "../Connect/BbnConnectedSmall";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { Logo } from "../Logo/Logo";
@@ -8,16 +10,24 @@ import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface HeaderProps {
   onConnect: () => void;
+  onConnectBabylon: () => void;
   address: string;
+  bbnAddress: string;
   btcWalletBalanceSat?: number;
+  bbnWalletBalance?: number;
   onDisconnect: () => void;
+  onDisconnectBabylon: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onConnect,
+  onConnectBabylon,
   address,
+  bbnAddress,
   btcWalletBalanceSat,
+  bbnWalletBalance,
   onDisconnect,
+  onDisconnectBabylon,
 }) => {
   return (
     <nav>
@@ -37,6 +47,12 @@ export const Header: React.FC<HeaderProps> = ({
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
           />
+          <BbnConnectSmall
+            onConnect={onConnectBabylon}
+            bbnAddress={bbnAddress}
+            bbnWalletBalance={bbnWalletBalance}
+            onDisconnect={onDisconnectBabylon}
+          />
           <ThemeToggle />
         </div>
         <div
@@ -46,6 +62,11 @@ export const Header: React.FC<HeaderProps> = ({
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
+          />
+          <BbnConnectedSmall
+            bbnAddress={bbnAddress}
+            bbnWalletBalance={bbnWalletBalance ?? 0}
+            onDisconnect={onDisconnectBabylon}
           />
         </div>
       </div>

@@ -17,6 +17,10 @@ import {
   isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet/index";
+import {
+  BbnWalletInfo,
+  connectKeplrWallet,
+} from "@/utils/wallet/providers/babylon_wallet";
 import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
@@ -27,6 +31,7 @@ import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
+import { BbnConnectModal } from "./components/Modals/BbnConnectModal";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { PrivacyModal } from "./components/Modals/Privacy/PrivacyModal";
@@ -47,7 +52,10 @@ const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
-
+  const [bbnWallet, setBBNWallet] = useState<BbnWalletInfo | undefined>(
+    undefined,
+  );
+  const [bbnAddress, setBbnAddress] = useState("");
   const [address, setAddress] = useState("");
   const {
     error,
@@ -205,12 +213,23 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
+  const [bbnConnectModalOpen, setBbnConnectModalOpen] = useState(false);
+
+  const handleBbnConnectModal = () => {
+    setBbnConnectModalOpen(true);
+  };
+
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
 
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
+  };
+
+  const handleDisconnectBBN = () => {
+    setBBNWallet(undefined);
+    setBbnAddress("");
   };
 
   const handleConnectBTC = useCallback(
@@ -284,6 +303,27 @@ const Home: React.FC<HomeProps> = () => {
     }
   }, [btcWallet, handleConnectBTC]);
 
+  const handleConnectBBN = async () => {
+    // close the modal
+    setBbnConnectModalOpen(false);
+    try {
+      const wallet = await connectKeplrWallet();
+      setBBNWallet(wallet);
+      setBbnAddress(wallet.addressBech32);
+    } catch (error: Error | any) {
+      setBBNWallet(undefined);
+      setBbnAddress("");
+      showError({
+        error: {
+          message: error.message || "Error connecting to Babylon Network",
+          errorState: ErrorState.WALLET,
+          errorTime: new Date(),
+        },
+        retryAction: () => handleConnectBBN(),
+      });
+    }
+  };
+
   // Clean up the local storage delegations
   useEffect(() => {
     if (!delegations?.delegations) {
@@ -322,6 +362,8 @@ const Home: React.FC<HomeProps> = () => {
     0,
   );
 
+  const bbnWalletBalance = 0;
+
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -332,6 +374,10 @@ const Home: React.FC<HomeProps> = () => {
         onDisconnect={handleDisconnectBTC}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
+        onConnectBabylon={handleBbnConnectModal}
+        bbnAddress={bbnAddress}
+        onDisconnectBabylon={handleDisconnectBBN}
+        bbnWalletBalance={bbnWalletBalance}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
@@ -393,6 +439,11 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <BbnConnectModal
+        open={bbnConnectModalOpen}
+        onClose={setBbnConnectModalOpen}
+        onConnect={handleConnectBBN}
       />
       <ErrorModal
         open={isErrorOpen}
