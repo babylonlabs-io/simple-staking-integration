@@ -23,6 +23,7 @@ import {
 } from "@/utils/wallet/providers/babylon_wallet";
 import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
+import { getBBNBalance } from "./api/getBBNBalance";
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { UTXO_KEY } from "./common/constants";
@@ -362,7 +363,20 @@ const Home: React.FC<HomeProps> = () => {
     0,
   );
 
-  const bbnWalletBalance = 0;
+  const { data: bbnWalletBalanceData, status: bbnWalletBalanceStatus } =
+    useQuery({
+      queryKey: ["balance", "bbn", bbnAddress],
+      queryFn: () => getBBNBalance(bbnAddress),
+      refetchInterval: 300000, // 5 minutes
+      enabled: !!bbnWallet?.addressBech32,
+    });
+
+  const bbnWalletBalanceLoading =
+    bbnWalletBalanceStatus !== "success" || !bbnWalletBalanceData;
+
+  const bbnWalletBalance = bbnWalletBalanceData?.balances?.[0]?.amount
+    ? Number(bbnWalletBalanceData.balances[0].amount) / 1e6
+    : undefined;
 
   return (
     <main

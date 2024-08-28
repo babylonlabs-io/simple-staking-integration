@@ -63,7 +63,7 @@ export const BbnConnectSmall: React.FC<BbnConnectSmallProps> = ({
             <span className="text-secondary font-semibold">BBN:</span>
             {typeof bbnWalletBalance === "number" ? (
               <p>
-                <strong>{bbnWalletBalance.toFixed(2)} BBN</strong>
+                <strong>{bbnWalletBalance.toFixed(2)} tBBN</strong>
               </p>
             ) : (
               <LoadingSmall text="Loading..." />

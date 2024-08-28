@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
           />
           <BbnConnectedSmall
             bbnAddress={bbnAddress}
-            bbnWalletBalance={bbnWalletBalance ?? 0}
+            bbnWalletBalance={bbnWalletBalance}
             onDisconnect={onDisconnectBabylon}
           />
         </div>

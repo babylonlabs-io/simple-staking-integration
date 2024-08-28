@@ -9,7 +9,7 @@ import { LoadingSmall } from "../Loading/Loading";
 
 interface BbnConnectedSmallProps {
   bbnAddress: string;
-  bbnWalletBalance: number;
+  bbnWalletBalance?: number;
   onDisconnect: () => void;
 }
 
@@ -38,7 +38,7 @@ export const BbnConnectedSmall: React.FC<BbnConnectedSmallProps> = ({
               <span className="text-secondary font-semibold">BBN:</span>
               {typeof bbnWalletBalance === "number" ? (
                 <p>
-                  <strong>{bbnWalletBalance.toFixed(2)} BBN</strong>
+                  <strong>{bbnWalletBalance.toFixed(2)} tBBN</strong>
                 </p>
               ) : (
                 <LoadingSmall text="Loading..." />
